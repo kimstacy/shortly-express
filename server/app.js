@@ -74,32 +74,58 @@ app.post('/links', (req, res, next) => {
 // Write your authentication routes here
 /************************************************************/
 
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+
 app.post('/login', (req, res, next) => {
-  // access database // how to access database in this file?
-  // check for user.username (if user exists)
-  // user.password user.salt
+  var username = req.body.username;
+  var password = req.body.password;
   models.Users.compare(req.body.password, user.password, user.salt);
+
   next();
 });
 
+
+app.get('/signup', (req, res) => {
+  res.render('signup');
+});
+
+
 app.post('/signup', (req, res, next) => {
+  // check database if username already exists
+  var username = req.body.username;
+  var password = req.body.password;
+  var usernameExists = models.Users.doesUserExist({ username });
+  console.log(usernameExists);
+
+  // if true then dont create new user
+  return models.Users.get({ username })
+    .then(user => {
+      if (user) { // if user exists
+        throw 'User already exists';
+      } else { // if user doesn't exist
+        return models.Users.create({ username, password }); // create user w/ pw
+      }
+    })
+
+    .catch((error) => {
+      console.log(error);
+      res.redirect('/signup');
+    });
+
+
+  // If user doesn't exist
   var userData = {
     username: req.body.username,
     password: req.body.password
   };
-  models.Users.create(userData);
-  // .then()
 
-
-  // if (username) {
-  //   throw 'User already exists.';
-  // }
-
-  // .then(({ url }) => {
-  //   res.redirect(/signup);
-  // })
+  // models.Users.create(userData);
 
   next();
+
 });
 
 /************************************************************/
