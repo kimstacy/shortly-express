@@ -1,0 +1,70 @@
+    CLIENT         MIDDLEWARE        SERVER         DATABASE
++------------+   +------------+   +----------+   +------------+
+  Backbone         Express           Node            MySQL
+  Handlebars         - Server
+  jQuery             - Routing
+
+MySQL Database Tables ⭕️
+clicks | links | users | sessions
+
+💠 PUBLIC 💠
+
+🔸CLIENT
+  ├── app.js
+  ├── createLinkView.js
+  ├── link.js
+  ├── links.js
+  ├── linksView.js
+  ├── linkView.js
+  └── router.js
+
+🔸LIB
+  ├── backbone.js
+  ├── handlebars.js
+  ├── jquery.js
+  └── underscore.js
+
+💠 SERVER 💠
+
+🎾 app.js |  Application main entry point
+    🔘 Authentication Routes
+    🔘 Middleware Functions
+    - Beginning of the server, where client interacts with
+    - Imports everything else we're using (main connection hub)
+
+🎾 index.js | Connects server/app functions with MySQL Database
+
+🔸DB
+  ├── config.js - Creates the database
+  └── index.js - Connects app.js with /db folder (Promise, Bluebird)
+
+🔸LIB
+  └── hashUtils.js - Hashing Utility Functions
+      🔘 ƒ createHash, compareHash, createRandom32String
+
+🔸MIDDLEWARE |  Helper functions for our server
+  ├── auth.js - Authentication Middleware Functions
+      🔘 ƒ createSession
+  └── cookieParser.js
+      🔘 ƒ parseCookies
+
+🔸MODELS
+  ├── click.js
+  ├── index.js
+  ├── link.js
+  ├── model.js
+  ├── user.js
+  └── session.js
+
+🔸VIEWS
+  ├── index.ejs
+  ├── layout.ejs
+  ├── login.ejs
+  └── signup.ejs
+
+  🔸PARTIALS |  Backbone Templates
+    └── backbone_templates.ejs
+
+
+
+

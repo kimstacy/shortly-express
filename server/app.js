@@ -15,7 +15,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-
+app.use(require('./middleware/cookieParser'));
+app.use(Auth.createSession);
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -98,40 +99,31 @@ app.post('/signup', (req, res, next) => {
   var username = req.body.username;
   var password = req.body.password;
 
-  // if true then dont create new user
+  // Check if user exists
   return models.Users.get({username})
     .then(user => {
-      // if user exists
+      // If user exists
       if (user) {
-        throw new Error('User already exists'); // or throw user on line 122
-      // if user doesn't exist
-      } else { // create new user w/ pw
+        // Redirect user to /signup page
+        throw user;
+      } else {
+      // If user doesn't exist, Create new user + pw
         return models.Users.create({ username, password });
       }
     })
 
+    // Upgrade session / Associate with user
+    // Redirect user to / route
     .then((user) => {
-      // {throw user};
-    // .error(error => res.status(500).send(error));
-      // User isLoggedIn, createSession
-      // Sessions.create() will create a new session; a hash is randomly generated
-      // session - id, hash, userId
-      // isLoggedIn takes in a session
-      // createSession
-      res.redirect('/');
-      var session = models.Sessions.create();
-      console.log('session ', session);
-      models.Sessions.isLoggedIn(session);
-      // login({ username password })
-      // login with username and password
-      // start session
+      // update session with new user
+      return models.Sessions.update({ hash: req.session.hash }, {userId: user.insertId});
     })
-    .catch((error) => {
-      console.log(error);
+    .then(() => {
+      res.redirect('/');
+    })
+    .catch((user) => {
       res.redirect('/signup');
     });
-
-  next();
 });
 
 /************************************************************/
